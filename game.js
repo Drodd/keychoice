@@ -661,6 +661,55 @@ function animateDate(startDate, endDate, duration = 2000) {
     });
 }
 
+// 日期倒退动画（用于重新开始游戏）
+function animateDateReverse(startDate, endDate, duration = 2000) {
+    return new Promise((resolve) => {
+        const dateText = document.getElementById('date-text');
+        const startTime = Date.now();
+        
+        // 计算总天数差（负数，因为是倒退）
+        const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        let currentDays = 0;
+        
+        // 设置固定格式，避免字符长度变化
+        function formatFixedDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+        
+        function updateDate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // 使用缓动函数（倒退感觉）
+            const easeProgress = Math.pow(progress, 2);
+            
+            // 计算当前应显示的天数（整数递减）
+            const targetDays = Math.floor(totalDays * easeProgress);
+            
+            // 只在天数变化时更新显示，减少闪烁
+            if (targetDays !== currentDays || progress === 1) {
+                currentDays = targetDays;
+                const currentDate = new Date(startDate);
+                currentDate.setDate(currentDate.getDate() + currentDays);
+                dateText.textContent = formatFixedDate(currentDate);
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateDate);
+            } else {
+                // 确保最终显示正确的结束日期
+                dateText.textContent = formatFixedDate(endDate);
+                resolve();
+            }
+        }
+        
+        updateDate();
+    });
+}
+
 // 逐字打印效果
 function typewriterEffect(element, text, speed = 50) {
     return new Promise((resolve) => {
@@ -1062,16 +1111,88 @@ function closeModal() {
     document.getElementById('endgame-modal').style.display = 'none';
 }
 
+// 重新开始转场序列
+async function restartTransitionSequence() {
+    if (gameState.isTransitioning) return;
+    gameState.isTransitioning = true;
+    
+    const storyContainer = document.getElementById('story-container');
+    const choicesContainer = document.getElementById('choices-container');
+    const transitionOverlay = document.getElementById('transition-overlay');
+    const dateDisplay = document.querySelector('.date-display');
+    const storyBubble = document.getElementById('story-bubble');
+    
+    // 1. 当前内容淡出 (0.5秒)
+    storyContainer.classList.add('fade-out');
+    choicesContainer.classList.add('fade-out');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 2. 黑幕淡入 (0.5秒)
+    transitionOverlay.classList.add('show');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 在黑幕下清除所有内容
+    const storyTextElement = document.getElementById('story-text');
+    storyTextElement.textContent = '';
+    storyBubble.classList.remove('show');
+    choicesContainer.innerHTML = '';
+    choicesContainer.classList.remove('show');
+    choicesContainer.classList.add('hidden');
+    
+    // 3. 显示日期并播放倒退动画 (2.5秒)
+    const currentDate = new Date(gameState.currentDate);
+    const initialDate = new Date(2025, 5, 20); // 初始日期
+    
+    // 设置日期文字（带"时光倒流"提示）
+    function formatFixedDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}年${month}月${day}日`;
+    }
+    
+    const dateText = document.getElementById('date-text');
+    dateText.textContent = formatFixedDate(currentDate) + '，时光倒流';
+    
+    dateDisplay.classList.add('show');
+    
+    // 等待一下让用户看到"时光倒流"
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // 播放日期倒退动画
+    await animateDateReverse(currentDate, initialDate, 2000);
+    
+    // 4. 日期淡出 (0.5秒)
+    dateDisplay.classList.remove('show');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 5. 重置游戏状态
+    initGame();
+    
+    // 6. 切换到第一个场景的图片
+    const firstScene = gameData[gameState.currentScene];
+    document.getElementById('scene-image').src = firstScene.image;
+    
+    // 7. 黑幕淡出 (0.5秒)
+    transitionOverlay.classList.remove('show');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    gameState.isTransitioning = false;
+    
+    // 8. 加载第一个场景
+    await loadScene(gameState.currentScene);
+}
+
 // 重新开始游戏
 async function restartGame() {
     closeModal();
     if (gameState.isGameStarted) {
-        // 重置游戏状态
-        initGame();
-        
-        // 显示开场黑幕和日期，然后加载第一个场景
-        await showOpeningSequence();
-        await loadScene(gameState.currentScene);
+        // 使用专门的重新开始转场序列
+        await restartTransitionSequence();
     } else {
         // 如果游戏还没开始，回到首页
         const startScreen = document.getElementById('start-screen');
