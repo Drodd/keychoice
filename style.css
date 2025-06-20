@@ -16,14 +16,21 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh; /* 动态视口高度 */
     padding: 0;
     margin: 0;
     overflow: hidden;
+    /* 移动设备优化 */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .game-container {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* 动态视口高度，适配移动设备 */
     max-width: none;
     background: #000;
     border-radius: 0;
@@ -205,6 +212,10 @@ body {
     font-weight: 300;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     white-space: nowrap;
+    font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+    min-width: 300px;
+    display: inline-block;
+    text-align: center;
 }
 
 .story-container {
@@ -276,7 +287,7 @@ body {
 }
 
 .choices-container {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
@@ -285,9 +296,11 @@ body {
     flex-direction: column;
     gap: 8px;
     overflow: visible;
-    padding: 8px 15px 8px 15px;
+    padding: 8px 15px 20px 15px;
     opacity: 1;
     transition: opacity 0.5s ease;
+    background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .choices-container.fade-out {
@@ -456,6 +469,35 @@ body {
     body {
         padding: 0;
         margin: 0;
+    }
+}
+
+/* 移动设备优化 */
+@media (max-width: 768px) {
+    .choices-container {
+        padding: 10px 15px;
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
+    }
+    
+    .choice-button {
+        padding: 14px 16px;
+        font-size: 15px;
+        min-height: 48px;
+        border-radius: 12px;
+    }
+    
+    .game-container {
+        height: 100vh;
+        height: 100dvh; /* 使用动态视口高度 */
+    }
+}
+
+/* iPhone等设备的安全区域适配 */
+@supports (padding: max(0px)) {
+    .choices-container {
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
 }
 

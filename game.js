@@ -14,6 +14,7 @@ const gameData = {
     scene1: {
         image: 'img/plot1.png',
         text: '模拟考的成绩单像一幅抽象画。老师说它很有精神污染的潜力。我爸没说话，只是默默把阳台的窗户锁死了。我妈说，要不，咱出国吧。换个地方，换换风水。',
+        useTransition: false, // 首个场景不需要转场
         choices: [
             {
                 name: '参加高考，相信奇迹',
@@ -60,6 +61,7 @@ const gameData = {
     scene4: {
         image: 'img/plot4.png',
         text: '通勤地铁是个铁皮罐头。塞满了疲惫的沙丁鱼。我就是其中一条。离目的地还有三十分钟时，我面前出现个空位。',
+        useTransition: true, // 重要的分支点，需要转场
         choices: [
             {
                 name: '坐下',
@@ -82,6 +84,7 @@ const gameData = {
     scene5: {
         image: 'img/plot5.png',
         text: '我决定坐下。就在那时，我看见了她，身穿一件干净的白大衣，直勾勾地看我……让我心神不宁，于是我走向她，然后朝另一节车厢去了。',
+        useTransition: false, // 紧接上一个场景，不需要转场
         choices: [
             {
                 name: '继续',
@@ -108,6 +111,7 @@ const gameData = {
     scene7: {
         image: 'img/plot7.png',
         text: '我毕业了，也待业了。第一次认识到自己的渺小，简历投出去，像往海里扔漂流瓶。也许老天在提醒我需要继续深造？脑中突然闪过一丝邪念，也许创业才是我的宿命？',
+        useTransition: true, // 时间跨度大（从大学到毕业），需要转场
         choices: [
             {
                 name: '创业',
@@ -155,6 +159,7 @@ const gameData = {
     scene10: {
         image: 'img/plot4.png',
         text: '通勤地铁依然是那个铁皮罐头。我还是那条沙丁鱼，只是现在穿着定制西装。我站在同样的位置。离目的地还有三十分钟时，我面前出现个空位。',
+        useTransition: true, // 时间跨度很大（创业/读研成功后），需要转场
         choices: [
             {
                 name: '坐下',
@@ -372,6 +377,12 @@ function initStartScreen() {
     const startButton = document.getElementById('start-button');
     startButton.style.display = 'none'; // 初始隐藏开始按钮
     
+    // 重置游戏状态（包括日期）
+    gameState.currentDate = new Date(2025, 5, 20);
+    gameState.isTransitioning = false;
+    gameState.end_flag1 = 0;
+    gameState.end_flag2 = 0;
+    
     // 预加载图片
     preloadImages().then(() => {
         // 图片加载完成后显示开始按钮
@@ -380,7 +391,7 @@ function initStartScreen() {
 }
 
 // 开始游戏
-function startGame() {
+async function startGame() {
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     
@@ -388,9 +399,65 @@ function startGame() {
     startScreen.style.display = 'none';
     gameScreen.style.display = 'block';
     
-    // 初始化游戏
+    // 初始化游戏状态
     gameState.isGameStarted = true;
-    initGame();
+    gameState.end_flag1 = 0;
+    gameState.end_flag2 = 0;
+    gameState.currentScene = 'scene1';
+    gameState.currentDate = new Date(2025, 5, 20); // 重置日期到起始时间
+    gameState.isTransitioning = false;
+    
+    // 显示开场黑幕和日期
+    await showOpeningSequence();
+    
+    // 加载第一个场景
+    await loadScene(gameState.currentScene);
+}
+
+// 开场序列：黑幕显示日期，然后淡出
+async function showOpeningSequence() {
+    const transitionOverlay = document.getElementById('transition-overlay');
+    const dateDisplay = document.querySelector('.date-display');
+    const dateText = document.getElementById('date-text');
+    const storyContainer = document.getElementById('story-container');
+    const choicesContainer = document.getElementById('choices-container');
+    
+    // 隐藏故事容器和选择容器
+    storyContainer.style.opacity = '0';
+    choicesContainer.style.opacity = '0';
+    
+    // 设置日期文本，使用固定格式
+    function formatFixedDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}年${month}月${day}日`;
+    }
+    
+    dateText.textContent = formatFixedDate(gameState.currentDate) + '，高考前';
+    
+    // 显示黑幕和日期
+    transitionOverlay.classList.add('show');
+    dateDisplay.classList.add('show');
+    
+    // 等待3秒让用户看到日期
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // 日期淡出
+    dateDisplay.classList.remove('show');
+    
+    // 等待日期淡出完成
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 黑幕淡出
+    transitionOverlay.classList.remove('show');
+    
+    // 等待黑幕淡出完成
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 恢复故事容器和选择容器的可见性
+    storyContainer.style.opacity = '1';
+    choicesContainer.style.opacity = '1';
 }
 
 // 初始化游戏
@@ -398,8 +465,9 @@ function initGame() {
     gameState.end_flag1 = 0;
     gameState.end_flag2 = 0;
     gameState.currentScene = 'scene1';
+    gameState.currentDate = new Date(2025, 5, 20); // 重置日期到起始时间
+    gameState.isTransitioning = false;
     updateUI();
-    loadScene(gameState.currentScene);
 }
 
 // 更新UI显示
@@ -416,13 +484,23 @@ function formatDate(date) {
     return `${year}年${month}月${day}日`;
 }
 
-// 日期滚动动画
+// 日期滚动动画 - 改进版本，避免字符长度变化导致的视觉跳动
 function animateDate(startDate, endDate, duration = 2000) {
     return new Promise((resolve) => {
         const dateText = document.getElementById('date-text');
         const startTime = Date.now();
-        const startTimestamp = startDate.getTime();
-        const endTimestamp = endDate.getTime();
+        
+        // 计算总天数差
+        const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        let currentDays = 0;
+        
+        // 设置固定格式，避免字符长度变化
+        function formatFixedDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
         
         function updateDate() {
             const elapsed = Date.now() - startTime;
@@ -430,14 +508,23 @@ function animateDate(startDate, endDate, duration = 2000) {
             
             // 使用缓动函数
             const easeProgress = 1 - Math.pow(1 - progress, 3);
-            const currentTimestamp = startTimestamp + (endTimestamp - startTimestamp) * easeProgress;
-            const currentDate = new Date(currentTimestamp);
             
-            dateText.textContent = formatDate(currentDate);
+            // 计算当前应显示的天数（整数递增）
+            const targetDays = Math.floor(totalDays * easeProgress);
+            
+            // 只在天数变化时更新显示，减少闪烁
+            if (targetDays !== currentDays || progress === 1) {
+                currentDays = targetDays;
+                const currentDate = new Date(startDate);
+                currentDate.setDate(currentDate.getDate() + currentDays);
+                dateText.textContent = formatFixedDate(currentDate);
+            }
             
             if (progress < 1) {
                 requestAnimationFrame(updateDate);
             } else {
+                // 确保最终显示正确的结束日期
+                dateText.textContent = formatFixedDate(endDate);
                 resolve();
             }
         }
@@ -559,8 +646,8 @@ async function transitionToScene(sceneId) {
     gameState.isTransitioning = false;
 }
 
-// 加载场景（用于首次加载，不需要转场动画）
-function loadScene(sceneId) {
+// 加载场景（用于首次加载，添加入场动画）
+async function loadScene(sceneId) {
     const scene = gameData[sceneId];
     if (!scene) {
         console.error('场景不存在:', sceneId);
@@ -573,18 +660,24 @@ function loadScene(sceneId) {
     // 更新文本
     const storyText = document.getElementById('story-text');
     const storyBubble = document.getElementById('story-bubble');
-    
-    // 直接显示文本，不使用打字效果
-    storyText.textContent = scene.text;
-    
-    // 显示气泡
-    storyBubble.classList.add('show');
-    
-    // 清空现有选项
     const choicesContainer = document.getElementById('choices-container');
+    
+    // 初始化状态
+    storyText.textContent = '';
+    storyBubble.classList.remove('show');
+    choicesContainer.classList.add('hidden');
     choicesContainer.innerHTML = '';
-    choicesContainer.classList.remove('hidden', 'fade-out');
-    choicesContainer.classList.add('show');
+    
+    // 气泡入场
+    setTimeout(() => {
+        storyBubble.classList.add('show');
+    }, 100);
+    
+    // 逐字打印文本
+    const textLength = scene.text.length;
+    const typingSpeed = Math.max(30, Math.min(80, 1500 / textLength)); // 根据文字长短调整速度
+    
+    await typewriterEffect(storyText, scene.text, typingSpeed);
     
     // 创建选项按钮
     const unlockedChoices = scene.choices.filter(choice => isChoiceUnlocked(choice));
@@ -598,6 +691,12 @@ function loadScene(sceneId) {
         button.onclick = () => handleChoice(choice);
         choicesContainer.appendChild(button);
     });
+    
+    // 选项入场动画
+    setTimeout(() => {
+        choicesContainer.classList.remove('hidden');
+        choicesContainer.classList.add('show');
+    }, 300);
 }
 
 
@@ -647,6 +746,31 @@ function checkSingleCondition(condition) {
     return true;
 }
 
+// 检查场景是否需要转场动画
+function shouldUseTransition(sceneId) {
+    const scene = gameData[sceneId];
+    if (!scene) return false;
+    
+    // 如果场景明确指定了useTransition，使用该设置
+    if (scene.hasOwnProperty('useTransition')) {
+        return scene.useTransition;
+    }
+    
+    // 默认行为：分析场景特征来决定是否需要转场
+    // 连续性强的场景（如"继续"选项）通常不需要转场
+    const currentScene = gameData[gameState.currentScene];
+    if (currentScene && currentScene.choices) {
+        const hasOnlyContinue = currentScene.choices.length === 1 && 
+                               currentScene.choices[0].name === '继续';
+        if (hasOnlyContinue) {
+            return false; // 只有"继续"选项的场景不需要转场
+        }
+    }
+    
+    // 默认使用转场动画
+    return true;
+}
+
 // 处理选项点击
 function handleChoice(choice) {
     if (gameState.isTransitioning) return; // 防止在转场过程中点击
@@ -670,7 +794,13 @@ function handleChoice(choice) {
             showEndGameModal();
         } else {
             gameState.currentScene = effects.nextScene;
-            transitionToScene(effects.nextScene); // 使用转场动画
+            
+            // 根据场景配置决定是否使用转场动画
+            if (shouldUseTransition(effects.nextScene)) {
+                transitionToScene(effects.nextScene);
+            } else {
+                loadScene(effects.nextScene); // 直接加载场景，无转场
+            }
         }
     }
 }
