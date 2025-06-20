@@ -6,7 +6,8 @@ let gameState = {
     isGameStarted: false,
     preloadedImages: [],
     currentDate: new Date(2025, 5, 20), // 2025年6月20日
-    isTransitioning: false
+    isTransitioning: false,
+    nextSceneImages: new Map() // 存储预加载的下一个场景图片
 };
 
 // 游戏情节数据
@@ -35,6 +36,7 @@ const gameData = {
     scene2: {
         image: 'img/plot2.png',
         text: '奇迹没来。它可能在路上堵车了。我考上了一个二本，学校的名字我跟我爹说了三遍，他都没记住，最后挥挥手说：“挺好，至少是个大学。”但对你来说，那更像是个网吧。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -48,6 +50,7 @@ const gameData = {
     scene3: {
         image: 'img/plot3.png',
         text: '于是我走了。机票是单程的。飞机穿过云层，下面是我住了十八年的城市。一片灰色的水泥森林，像个巨大的停车场。再见了，我的牢笼。窗外的天空很蓝。未来像一张崭新的彩票。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -98,6 +101,7 @@ const gameData = {
     scene6: {
         image: 'img/plot6.png',
         text: '我选择站着，却被面前冒出的cosplay大叔吓得不轻。这个人多少脑子有点问题？也许是去参加漫展的吧？我不想关心，但那道视线还在，像粘在身上的口香糖。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -132,6 +136,7 @@ const gameData = {
     scene8: {
         image: 'img/plot8.png',
         text: '我的项目叫“AI智能筷子”。它有什么用？不知道。但它有先进的大语言模型，能分析你的进食速度，还能在你夹到最后一块红烧肉时播放胜利的交响乐。投资人说这不是筷子，这是通往健康元宇宙的钥匙。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -146,6 +151,7 @@ const gameData = {
     scene9: {
         image: 'img/plot9.png',
         text: '我的导师是个奇人，他认为人类的未来不在星辰大海，而在餐桌方寸之间。他的课题是“AI筷子”，内置了先进大语言模型，确保每一块宫保鸡丁都能被以最优雅、最高效的方式送入嘴中。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -198,6 +204,7 @@ const gameData = {
     scene11: {
         image: 'img/plot5.png',
         text: '我决定坐下。就在那时，我看见了她，身穿一件干净的白大衣，直勾勾地看我……让我心神不宁，于是我走向她，然后朝另一节车厢去了。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -211,6 +218,7 @@ const gameData = {
     scene12: {
         image: 'img/plot5.png',
         text: '我又看见了她，依然穿着白大褂。“我叫林，很高兴认识你。"她抢先开口，“我们的实验你可以拥有一切。想来体验一下吗？”我愣住了，这个诈骗把戏有些过于前卫，但是不影响我加她的微信。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -224,6 +232,7 @@ const gameData = {
     scene13: {
         image: 'img/plot6.png',
         text: '我选择站着，却被面前冒出的cosplay大叔吓得不轻。这个人多少脑子有点问题？也许是去参加漫展的吧。我不想关心。但那道视线还在，像粘在身上的口香糖。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -237,6 +246,7 @@ const gameData = {
     scene14: {
         image: 'img/plot6.png',
         text: '又看到了他。那个男人。还是那身行头，似乎从来没洗过。他径直朝我走过来，人群像摩西眼前的红海一样自动分开。“朋友，”他开口了，声音像砂纸磨过木头，“正确联盟需要你。”我心说大哥你可别说了，再说我就要报警了。',
+        useTransition: false,
         choices: [
             {
                 name: '继续',
@@ -250,6 +260,7 @@ const gameData = {
     scene15: {
         image: 'img/plot10.png',
         text: '全球经济衰退，股市巨震，多米诺骨牌倒了。我不想回家，不想看我爸妈失望的眼神。不想解释我如何把他们的养老金变成了一堆漂亮的PPT和一地鸡毛。',
+        useTransition: true,
         choices: [
             {
                 name: '继续',
@@ -280,6 +291,7 @@ const gameData = {
     scene16: {
         image: 'img/end1.png',
         text: '于是我上了山。方丈说，扫地，就是扫去心头的尘埃。他给了我一把扫帚。风吹过，新的叶子落下。我看着手里的扫帚，眼神一片茫然。',
+        useTransition: false,
         choices: [
             {
                 name: '结局：扫地僧',
@@ -293,6 +305,7 @@ const gameData = {
     scene17: {
         image: 'img/end2.png',
         text: '我走投无路，翻出了那个叫林的微信。她没有骗我。在这里，我成了首富。我住在云端的数据宫殿里，俯瞰着由0和1构成的繁华都市。',
+        useTransition: false,
         choices: [
             {
                 name: '结局：赛博首富',
@@ -306,6 +319,7 @@ const gameData = {
     scene18: {
         image: 'img/end3.png',
         text: '一个失眠的夜晚，窗外发出有节奏的敲击声，我打开窗，是那个男人。我知道这是我的宿命，正确联盟需要我，世界需要我。',
+        useTransition: false,
         choices: [
             {
                 name: '结局：正确联盟',
@@ -370,6 +384,120 @@ function preloadImages() {
             preloadContainer.appendChild(img);
         });
     });
+}
+
+// 切换到预加载的图片
+function switchToPreloadedImage(sceneId) {
+    return new Promise((resolve) => {
+        const scene = gameData[sceneId];
+        if (!scene) {
+            console.error('场景不存在:', sceneId);
+            resolve();
+            return;
+        }
+        
+        const currentImage = document.getElementById('scene-image');
+        
+        // 如果有预加载的图片，使用预加载的图片
+        if (gameState.nextSceneImages.has(sceneId)) {
+            const preloadedImg = gameState.nextSceneImages.get(sceneId);
+            
+            // 淡入预加载的图片
+            preloadedImg.style.transition = 'opacity 0.5s ease';
+            preloadedImg.style.opacity = '1';
+            preloadedImg.style.zIndex = '1';
+            
+            // 淡出当前图片
+            currentImage.style.transition = 'opacity 0.5s ease';
+            currentImage.style.opacity = '0';
+            
+            setTimeout(() => {
+                // 切换主图片
+                currentImage.src = scene.image;
+                currentImage.style.opacity = '1';
+                currentImage.style.transition = '';
+                
+                // 隐藏预加载的图片
+                preloadedImg.style.opacity = '0';
+                preloadedImg.style.zIndex = '-1';
+                
+                resolve();
+            }, 500);
+        } else {
+            // 如果没有预加载图片，直接切换
+            currentImage.src = scene.image;
+            resolve();
+        }
+    });
+}
+
+// 预加载当前场景所有选项对应的下一个场景图片
+function preloadNextSceneImages(currentSceneId) {
+    const currentScene = gameData[currentSceneId];
+    if (!currentScene || !currentScene.choices) return;
+    
+    // 清理之前的预加载图片
+    gameState.nextSceneImages.clear();
+    
+    // 获取所有可能的下一个场景
+    const nextScenes = currentScene.choices
+        .filter(choice => choice.effects && choice.effects.nextScene)
+        .map(choice => choice.effects.nextScene)
+        .filter(sceneId => sceneId !== 'endgame') // 排除结束场景
+        .filter((sceneId, index, arr) => arr.indexOf(sceneId) === index); // 去重
+    
+    // 预加载每个下一个场景的图片
+    nextScenes.forEach(sceneId => {
+        const scene = gameData[sceneId];
+        if (scene && scene.image) {
+            const img = new Image();
+            img.onload = () => {
+                console.log(`预加载完成: ${scene.image}`);
+            };
+            img.onerror = () => {
+                console.error(`预加载失败: ${scene.image}`);
+            };
+            img.src = scene.image;
+            img.style.opacity = '0';
+            img.style.position = 'absolute';
+            img.style.top = '0';
+            img.style.left = '0';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.objectPosition = 'center';
+            img.style.zIndex = '-1';
+            img.style.pointerEvents = 'none';
+            
+            // 将预加载的图片添加到容器中
+            const imageContainer = document.querySelector('.image-container');
+            imageContainer.appendChild(img);
+            
+            // 存储预加载的图片
+            gameState.nextSceneImages.set(sceneId, img);
+        }
+    });
+}
+
+// 清理未使用的预加载图片
+function cleanupUnusedPreloadedImages(usedSceneId) {
+    gameState.nextSceneImages.forEach((img, sceneId) => {
+        if (sceneId !== usedSceneId) {
+            // 移除未使用的图片
+            if (img.parentNode) {
+                img.parentNode.removeChild(img);
+            }
+        }
+    });
+    
+    // 只保留使用的图片
+    if (usedSceneId && gameState.nextSceneImages.has(usedSceneId)) {
+        const usedImg = gameState.nextSceneImages.get(usedSceneId);
+        gameState.nextSceneImages.clear();
+        gameState.nextSceneImages.set(usedSceneId, usedImg);
+    } else {
+        gameState.nextSceneImages.clear();
+    }
 }
 
 // 初始化首页
@@ -582,16 +710,28 @@ async function transitionToScene(sceneId) {
     
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // 3. 切换情节图片（在黑幕下方）
-    document.getElementById('scene-image').src = scene.image;
+    // 在黑幕下清除所有内容，避免穿帮
+    const storyTextElement = document.getElementById('story-text');
+    storyTextElement.textContent = '';
+    storyBubble.classList.remove('show');
+    choicesContainer.innerHTML = '';
+    choicesContainer.classList.remove('show');
+    choicesContainer.classList.add('hidden');
     
-    // 4. 更新日期并播放滚动动画 (2秒)
+    // 3&4. 同时进行：切换图片 + 日期滚动动画 (2秒)
     const daysToAdd = Math.floor(Math.random() * 200) + 600; // 600-800天
     const oldDate = new Date(gameState.currentDate);
     gameState.currentDate.setDate(gameState.currentDate.getDate() + daysToAdd);
     
+    // 显示日期
     dateDisplay.classList.add('show');
-    await animateDate(oldDate, gameState.currentDate, 2000);
+    
+    // 同时进行图片切换和日期滚动
+    const imageTransition = switchToPreloadedImage(sceneId);
+    const dateAnimation = animateDate(oldDate, gameState.currentDate, 2000);
+    
+    // 等待两个动画都完成
+    await Promise.all([imageTransition, dateAnimation]);
     
     // 5. 黑幕淡出 (0.5秒)
     transitionOverlay.classList.remove('show');
@@ -620,7 +760,6 @@ async function transitionToScene(sceneId) {
     await typewriterEffect(storyText, scene.text, typingSpeed);
     
     // 7. 显示选项入场动画 (0.5秒)
-    choicesContainer.innerHTML = '';
     choicesContainer.classList.remove('fade-out');
     choicesContainer.classList.add('hidden');
     
@@ -641,6 +780,102 @@ async function transitionToScene(sceneId) {
     setTimeout(() => {
         choicesContainer.classList.remove('hidden');
         choicesContainer.classList.add('show');
+        
+        // 预加载下一个场景的图片
+        preloadNextSceneImages(sceneId);
+    }, 300);
+    
+    gameState.isTransitioning = false;
+}
+
+// 简化转场动画序列（仅黑幕，无日期动画）
+async function simpleTransitionToScene(sceneId) {
+    if (gameState.isTransitioning) return;
+    gameState.isTransitioning = true;
+    
+    const scene = gameData[sceneId];
+    if (!scene) {
+        console.error('场景不存在:', sceneId);
+        gameState.isTransitioning = false;
+        return;
+    }
+    
+    const storyContainer = document.getElementById('story-container');
+    const choicesContainer = document.getElementById('choices-container');
+    const transitionOverlay = document.getElementById('transition-overlay');
+    const storyBubble = document.getElementById('story-bubble');
+    
+    // 1. 按钮和情节描述淡出 (0.5秒)
+    storyContainer.classList.add('fade-out');
+    choicesContainer.classList.add('fade-out');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 2. 黑幕淡入 (0.5秒)
+    transitionOverlay.classList.add('show');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 在黑幕下清除所有内容，避免穿帮
+    const storyTextElement = document.getElementById('story-text');
+    storyTextElement.textContent = '';
+    storyBubble.classList.remove('show');
+    choicesContainer.innerHTML = '';
+    choicesContainer.classList.remove('show');
+    choicesContainer.classList.add('hidden');
+    
+    // 3. 切换图片（1秒，比完整转场快）
+    await switchToPreloadedImage(sceneId);
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 4. 黑幕淡出 (0.5秒)
+    transitionOverlay.classList.remove('show');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 5. 情节气泡入场和逐字打印
+    storyContainer.classList.remove('fade-out');
+    storyBubble.classList.remove('show');
+    
+    const storyText = document.getElementById('story-text');
+    storyText.textContent = '';
+    
+    // 气泡入场
+    setTimeout(() => {
+        storyBubble.classList.add('show');
+    }, 100);
+    
+    // 开始逐字打印
+    const textLength = scene.text.length;
+    const typingSpeed = Math.max(30, Math.min(80, 1500 / textLength)); // 根据文字长短调整速度
+    
+    await typewriterEffect(storyText, scene.text, typingSpeed);
+    
+    // 6. 显示选项入场动画 (0.5秒)
+    choicesContainer.classList.remove('fade-out');
+    choicesContainer.classList.add('hidden');
+    
+    // 创建选项按钮
+    const unlockedChoices = scene.choices.filter(choice => isChoiceUnlocked(choice));
+    const maxChoices = 3;
+    const displayChoices = unlockedChoices.slice(0, maxChoices);
+    
+    displayChoices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.className = 'choice-button';
+        button.textContent = choice.name;
+        button.onclick = () => handleChoice(choice);
+        choicesContainer.appendChild(button);
+    });
+    
+    // 选项入场
+    setTimeout(() => {
+        choicesContainer.classList.remove('hidden');
+        choicesContainer.classList.add('show');
+        
+        // 预加载下一个场景的图片
+        preloadNextSceneImages(sceneId);
     }, 300);
     
     gameState.isTransitioning = false;
@@ -696,6 +931,9 @@ async function loadScene(sceneId) {
     setTimeout(() => {
         choicesContainer.classList.remove('hidden');
         choicesContainer.classList.add('show');
+        
+        // 预加载下一个场景的图片
+        preloadNextSceneImages(sceneId);
     }, 300);
 }
 
@@ -793,13 +1031,22 @@ function handleChoice(choice) {
         if (effects.nextScene === 'endgame') {
             showEndGameModal();
         } else {
+            // 清理未使用的预加载图片
+            cleanupUnusedPreloadedImages(effects.nextScene);
+            
             gameState.currentScene = effects.nextScene;
             
-            // 根据场景配置决定是否使用转场动画
-            if (shouldUseTransition(effects.nextScene)) {
+            // 根据场景配置决定转场类型
+            const scene = gameData[effects.nextScene];
+            if (scene && scene.hasOwnProperty('useTransition') && scene.useTransition === false) {
+                // useTransition为false：使用简化转场（黑幕但无日期动画）
+                simpleTransitionToScene(effects.nextScene);
+            } else if (shouldUseTransition(effects.nextScene)) {
+                // 完整转场动画（黑幕+日期滚动）
                 transitionToScene(effects.nextScene);
             } else {
-                loadScene(effects.nextScene); // 直接加载场景，无转场
+                // 直接加载场景，无转场
+                loadScene(effects.nextScene);
             }
         }
     }
@@ -816,10 +1063,15 @@ function closeModal() {
 }
 
 // 重新开始游戏
-function restartGame() {
+async function restartGame() {
     closeModal();
     if (gameState.isGameStarted) {
+        // 重置游戏状态
         initGame();
+        
+        // 显示开场黑幕和日期，然后加载第一个场景
+        await showOpeningSequence();
+        await loadScene(gameState.currentScene);
     } else {
         // 如果游戏还没开始，回到首页
         const startScreen = document.getElementById('start-screen');
