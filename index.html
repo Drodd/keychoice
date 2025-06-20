@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关键选择</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 游戏首页 -->
+        <div id="start-screen" class="start-screen">
+            <div class="preload-background"></div>
+            <div class="glass-overlay"></div>
+            <div class="start-content">
+                <h1 class="game-title">关键选择</h1>
+                <p class="game-description">在神秘的世界中做出选择，每个决定都将改变你的命运</p>
+                <button id="start-button" class="start-button">开始游戏</button>
+                <div class="loading-indicator">
+                    <div class="loading-text">正在加载游戏资源...</div>
+                    <div class="loading-bar">
+                        <div class="loading-progress" id="loading-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="game-screen" class="game-screen" style="display: none;">
+            <!-- 情节图片 -->
+            <div class="image-container">
+                <img id="scene-image" src="" alt="情节图片">
+            </div>
+            
+            <!-- 转场黑幕 -->
+            <div id="transition-overlay" class="transition-overlay">
+                <div class="date-display">
+                    <div class="date-text" id="date-text">2025年6月20日</div>
+                </div>
+            </div>
+            
+            <!-- 情节描述 -->
+            <div class="story-container" id="story-container">
+                <div class="story-bubble" id="story-bubble">
+                    <div id="story-text"></div>
+                </div>
+            </div>
+            
+            <!-- 选项按钮区域 -->
+            <div class="choices-container" id="choices-container">
+            </div>
+            
+            <!-- 游戏状态显示 -->
+            <div class="status-bar">
+                <span>Flag1: <span id="flag1-display">0</span></span>
+                <span>Flag2: <span id="flag2-display">0</span></span>
+            </div>
+        </div>
+
+        <!-- 预加载图片容器 -->
+        <div id="preload-images" style="display: none;"></div>
+    </div>
+
+    <!-- 结束游戏弹窗 -->
+    <div id="endgame-modal" class="modal">
+        <div class="modal-content">
+            <h2>游戏结束</h2>
+            <p>感谢您的游玩！</p>
+            <button onclick="restartGame()">重新开始</button>
+            <button onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html> 
